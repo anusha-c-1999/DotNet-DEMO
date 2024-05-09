@@ -1,0 +1,34 @@
+---
+- name: Install Docker and SonarQuber
+  hosts: all
+  become: yes
+
+  tasks:
+    - name: Install Docker
+      apt:
+        name: docker.io
+        state: present
+
+    - name: Start Docker service
+      ansible.builtin.service:
+        name: docker
+        state: started
+
+    - name: Add current user to Docker group
+      ansible.builtin.user:
+        name: ubuntu
+        groups: docker
+        append: yes
+
+    - name: Change permissions of /var/run/docker.sock
+      ansible.builtin.file:
+        path: /var/run/docker.sock
+        mode: '0777'
+
+    - name: Run SonarQube container
+      ansible.builtin.docker_container:
+        name: sonar
+        image: sonarqube:lts-community
+        ports:
+          - "9000:9000"
+        detach: yes

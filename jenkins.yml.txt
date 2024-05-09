@@ -1,0 +1,29 @@
+---
+- name: Install Java 11 and Jenkins
+  hosts: all
+  become: yes
+
+  tasks:
+    - name: Install Java 11
+      apt:
+        name: openjdk-11-jre
+        state: present
+      become: yes
+
+    - name: Add Jenkins repository key
+      ansible.builtin.shell: "curl -fsSL https://pkg.jenkins.io/debian/jenkins.io-2023.key | sudo tee /usr/share/keyrings/jenkins-keyring.asc > /dev/null"
+
+    - name: Add Jenkins repository
+      ansible.builtin.lineinfile:
+        path: /etc/apt/sources.list.d/jenkins.list
+        line: "deb [signed-by=/usr/share/keyrings/jenkins-keyring.asc] https://pkg.jenkins.io/debian binary/"
+        create: yes
+
+    - name: Update apt package cache
+      apt:
+        update_cache: yes
+
+    - name: Install Jenkins
+      apt:
+        name: jenkins
+        state: present

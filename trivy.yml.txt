@@ -1,0 +1,20 @@
+---
+- name: Install Trivy
+  hosts: all
+  become: yes
+  tasks:
+    - name: Add Trivy repository key
+      apt_key:
+        url: https://aquasecurity.github.io/trivy-repo/deb/public.key
+        state: present
+
+    - name: Add Trivy repository
+      apt_repository:
+        repo: deb [arch=amd64] https://aquasecurity.github.io/trivy-repo/deb {{ ansible_distribution_release }} main
+        state: present
+
+    - name: Install Trivy
+      apt:
+        name: trivy
+        state: present
+
